@@ -1,12 +1,13 @@
-from openai import OpenAI
+from google import genai
 import faiss
 import numpy 
 
 # Example documents about movies
 texts = [
-    "The Godfather is a classic mafia crime drama",
+    "The Godfather is a classic mafia crime drama about a boss avoiding prison",
     "Inception explores dreams within dreams",
     "The Shawshank Redemption is a story about hope and friendship",
+    "Prison Break is a story of how a brother breaks out of Prison for his brother"
 ]
 
 def get_embedding(text):
@@ -15,9 +16,16 @@ def get_embedding(text):
     # 1. Create an OpenAI client
     # 2. Make an API call to generate embeddings using the text-embedding-3-small model
     # 3. Return the embedding vector from the response
-    
+    client = genai.Client()
+    response = client.models.embed_content(
+        model="gemini-embedding-001",
+        contents=text
+    )
+
+    print(response)
+    return response.embeddings[0].values
     # Placeholder for the actual implementation
-    return [0] * 1536  # Placeholder with the expected dimension
+    # return [0] * 1536  # Placeholder with the expected dimension
 
 embeddings = []
 for text in texts:

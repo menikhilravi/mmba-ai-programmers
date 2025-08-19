@@ -1,32 +1,39 @@
-from openai import OpenAI
+from google import genai
 
-# Initialize OpenAI client
-client = OpenAI()
+client = genai.Client()
 
 def analyze_sentiment(review):
     """
     Analyze the sentiment of a movie review using structured output.
     Returns a dictionary with 'thought' and 'sentiment' keys.
     """
+    # TODO: Create a prompt that:
+    # 1. Asks for sentiment analysis
+    # 2. Specifies the required output format
+    #       thought: [analysis]
+    #       sentiment: [positive/negative]
+    # 3. Includes the review text
     prompt = f"""
-    I want you to tell me if the following movie review is positive or negative.
-
+    Analyze the sentiment of the following movie review:
     Review: {review}
-
-    The final response should be in the following format:
-    thought: analyze the review to determine if it's positive or negative
-    sentiment: "positive" or "negative"
+    Make sure the review is interpreted as a movie review. Don't make assumptions.
+    Think step by step.
+    Double check your work.
+    Return the output in the following format:
+    thought: [analysis],
+    sentiment: [positive/negative]
     """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini-2024-07-18",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
     )
 
-    # Parse the response
-    content = response.choices[0].message.content
-    lines = content.strip().split('sentiment:')
+    # TODO: Parse the response to extract thought and sentiment
+    # The response should be in the format:
+    # thought: [analysis]
+    # sentiment: [positive/negative]
+    lines = response.text.strip().split('sentiment:')
     
     result = {
         "thought": lines[0].replace("thought:", "").strip(),
@@ -34,6 +41,8 @@ def analyze_sentiment(review):
     }
     
     return result
+
+
 
 def main():
     # Test cases

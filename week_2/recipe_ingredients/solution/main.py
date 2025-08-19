@@ -1,41 +1,35 @@
-from openai import OpenAI
+from google import genai
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List
 from pprint import pprint
 import os
 
-class Ingredient(BaseModel):
-    """
-    Model for recipe ingredients with amount, unit, and name.
-    """
-    amount: Optional[float] = Field(description="Quantity of the ingredient")
-    unit: Optional[str] = Field(description="Unit of measurement (e.g., cup, tbsp, oz)")
-    name: str = Field(description="Name of the ingredient")
+# TODO: Add a new Ingredients model that can be used in the Recipe model with the following properties:
+# - amount
+# - unit
+# - name
 
 class Recipe(BaseModel):
     """
     Use this model when working with complete cooking recipes.
     """
     title: str = Field(description="Name of the recipe")
-    ingredients: List[Ingredient] = Field(description="List of ingredients needed for the recipe")
+    ingredients: List[str] = Field(description="List of ingredients needed for the recipe")
     instructions: List[str] = Field(description="Step-by-step instructions to prepare the recipe")
 
 def get_recipe_from_text(recipe_text: str) -> Recipe:
     """
     Convert recipe text into a structured Recipe object using OpenAI.
     """
-    client = OpenAI()
+    client = genai.Client()
 
     # Make the API call
-    response = client.responses.parse(
-        model="gpt-4o-mini-2024-07-18",
-        input=[
-            {"role": "user", "content": f"Convert this recipe into the specified format:\n\n{recipe_text}"}
-        ],
-        text_format=Recipe
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=f"Convert this recipe into the specified format:\n\n{recipe_text}"
     )
     
-    return response.output_parsed
+    return response.text
 
 # Example usage
 if __name__ == "__main__":
@@ -50,4 +44,5 @@ if __name__ == "__main__":
     recipe = get_recipe_from_text(recipe_text)
     
     # Print results
-    pprint(recipe)
+    pprint(recipe.ingredients[0])
+    # pprint(recipe) # to see the whole object

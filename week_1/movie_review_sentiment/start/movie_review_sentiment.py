@@ -13,15 +13,8 @@ def analyze_sentiment(review):
     #       thought: [analysis]
     #       sentiment: [positive/negative]
     # 3. Includes the review text
-    prompt = f"""
-    Analyze the sentiment of the following movie review:
-    Review: {review}
-    Make sure the review is interpreted as a movie review. Don't make assumptions.
-    Think step by step.
-    Double check your work.
-    Return the output in the following format:
-    thought: [analysis],
-    sentiment: [positive/negative]
+    prompt = """
+    # TODO: Add your prompt here
     """
 
     response = client.models.generate_content(
@@ -29,15 +22,14 @@ def analyze_sentiment(review):
         contents=prompt
     )
 
+    content = response.text
     # TODO: Parse the response to extract thought and sentiment
     # The response should be in the format:
     # thought: [analysis]
     # sentiment: [positive/negative]
-    lines = response.text.strip().split('sentiment:')
-    
     result = {
-        "thought": lines[0].replace("thought:", "").strip(),
-        "sentiment": lines[1]
+        "thought": "",  # TODO: Extract thought
+        "sentiment": ""  # TODO: Extract sentiment
     }
     
     return result
