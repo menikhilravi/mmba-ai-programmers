@@ -1,7 +1,6 @@
-from openai import OpenAI
+from google import genai
 
-# Initialize OpenAI client
-client = OpenAI()
+client = genai.Client()
 
 def analyze_sentiment(review):
     """
@@ -14,24 +13,31 @@ def analyze_sentiment(review):
     #       thought: [analysis]
     #       sentiment: [positive/negative]
     # 3. Includes the review text
-    prompt = """
-    # TODO: Add your prompt here
+    prompt = f"""
+    Analyze the sentiment of the following movie review:
+    Review: {review}
+    Make sure the review is interpreted as a movie review. Don't make assumptions.
+    Think step by step.
+    Double check your work.
+    Return the output in the following format:
+    thought: [analysis],
+    sentiment: [positive/negative]
     """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini-2024-07-18",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
     )
 
-    content = response.choices[0].message.content
     # TODO: Parse the response to extract thought and sentiment
     # The response should be in the format:
     # thought: [analysis]
     # sentiment: [positive/negative]
+    lines = response.text.strip().split('sentiment:')
+    
     result = {
-        "thought": "",  # TODO: Extract thought
-        "sentiment": ""  # TODO: Extract sentiment
+        "thought": lines[0].replace("thought:", "").strip(),
+        "sentiment": lines[1]
     }
     
     return result
